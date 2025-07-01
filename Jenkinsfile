@@ -13,14 +13,21 @@ node {
                     sh """
                         git config user.email 'sunilgade.cloud@gmail.com'
                         git config user.name 'sunilgadhe'
-                        cat deployment.yaml
-                        sed -i 's+sunilgadhe/test.*+sunilgadhe/test:${DOCKERTAG}+g' deployment.yaml
-                        cat deployment.yaml
-                        git add deployment.yaml
-                        git commit -m 'Done by Jenkins Job changemanifest: ${BUILD_NUMBER}' || echo 'No changes to commit'
-                        git remote set-url origin https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USERNAME}/kubernetesmanifest.git
-                        git pull --rebase origin main
-                        git push origin main
+                        # Always start clean
+                        git fetch origin
+                        git reset --hard origin/main
+
+                        # Update deployment.yaml
+                        sed -i s+sunilgadhe/test.*+sunilgadhe/test:26+g deployment.yaml
+
+                        # Commit only if there are changes
+                        if git diff --quiet; then
+                          echo "No changes to commit"
+                        else
+                          git add deployment.yaml
+                          git commit -m "Done by Jenkins Job changemanifest: ${BUILD_NUMBER}"
+                          git push https://sunilgadhe:${GIT_PASSWORD}@github.com/sunilgadhe/kubernetesmanifest.git
+                        fi
                     """
                 }
             }
