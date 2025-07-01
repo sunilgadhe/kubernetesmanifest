@@ -19,6 +19,7 @@ node {
                         git add deployment.yaml
                         git commit -m 'Done by Jenkins Job changemanifest: ${BUILD_NUMBER}' || echo 'No changes to commit'
                         git remote set-url origin https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USERNAME}/kubernetesmanifest.git
+                        git pull --rebase origin main
                         git push origin main
                     """
                 }
